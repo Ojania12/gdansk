@@ -13,12 +13,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet (mapa) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <style>
     html { scroll-behavior: smooth; }
     body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
-    .shine {
-      background: linear-gradient(110deg, rgba(255,255,255,.12), rgba(255,255,255,0) 40%), linear-gradient(135deg, #0ea5e9, #22c55e);
-    }
+    .shine { background: linear-gradient(110deg, rgba(255,255,255,.12), rgba(255,255,255,0) 40%), linear-gradient(135deg, #0ea5e9, #22c55e); }
+    #map { height: 420px; border-radius: 16px; overflow: hidden; }
+    .leaflet-popup-content-wrapper { border-radius: 12px; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100">
@@ -46,37 +49,28 @@
           <h1 class="text-4xl sm:text-6xl font-extrabold leading-tight mt-3">
             Jedziemy do <span class="text-cyan-400">Gdańska</span>!
           </h1>
+          <p id="countdown" class="mt-4 text-xl font-semibold text-cyan-300"></p>
           <p class="mt-4 text-lg text-slate-200/90 max-w-2xl">
             <strong>24–26 października</strong> spędzimy wspólny weekend nad Motławą: starówka, morskie powietrze i dużo dobrego czasu razem. Będzie przyjaźnie, lekko i z nutą przygody!
           </p>
 
-          <!-- Countdown -->
-          <div id="countdown" class="mt-6 flex flex-wrap gap-3">
-            <div class="rounded-2xl px-4 py-3 bg-white/5 ring-1 ring-white/10 text-center">
-              <div id="cd-days" class="text-3xl font-extrabold">–</div>
-              <div class="text-xs uppercase tracking-widest text-slate-300/80">Dni</div>
-            </div>
-            <div class="rounded-2xl px-4 py-3 bg-white/5 ring-1 ring-white/10 text-center">
-              <div id="cd-hours" class="text-3xl font-extrabold">–</div>
-              <div class="text-xs uppercase tracking-widest text-slate-300/80">Godziny</div>
-            </div>
-            <div class="rounded-2xl px-4 py-3 bg-white/5 ring-1 ring-white/10 text-center">
-              <div id="cd-mins" class="text-3xl font-extrabold">–</div>
-              <div class="text-xs uppercase tracking-widest text-slate-300/80">Minuty</div>
-            </div>
-            <div class="rounded-2xl px-4 py-3 bg-white/5 ring-1 ring-white/10 text-center">
-              <div id="cd-secs" class="text-3xl font-extrabold">–</div>
-              <div class="text-xs uppercase tracking-widest text-slate-300/80">Sekundy</div>
+          <!-- Sekcja z filmem YouTube -->
+          <div class="mt-8 rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-lg">
+            <div style="position:relative;padding-top:56.25%;background:#000;">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/q_oSy1m9u-0"
+                title="Film o Gdańsku"
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
             </div>
           </div>
 
           <div class="mt-8 flex flex-col sm:flex-row gap-4">
-            <a href="#rsvp" class="inline-flex items-center justify-center rounded-2xl px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold shadow-lg shadow-cyan-500/30">
-              Potwierdź udział
-            </a>
-            <a href="#plan" class="inline-flex items-center justify-center rounded-2xl px-6 py-3 ring-1 ring-white/15 hover:bg-white/5 font-semibold">
-              Zobacz plan
-            </a>
+            <a href="#rsvp" class="inline-flex items-center justify-center rounded-2xl px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold shadow-lg shadow-cyan-500/30">Potwierdź udział</a>
+            <a href="#plan" class="inline-flex items-center justify-center rounded-2xl px-6 py-3 ring-1 ring-white/15 hover:bg-white/5 font-semibold">Zobacz plan</a>
           </div>
           <div class="mt-10 text-sm text-slate-300/80">📍 Gdańsk • 🗓️ 24–26.10 • 👥 Wspólna ekipa</div>
         </div>
@@ -139,33 +133,28 @@
     </div>
   </section>
 
-  <!-- Logistyka -->
+  <!-- Logistyka z mapą -->
   <section id="logistyka" class="py-16 sm:py-24 bg-gradient-to-b from-slate-900 to-slate-950">
     <div class="max-w-6xl mx-auto px-6">
       <h2 class="text-2xl sm:text-3xl font-bold">Logistyka</h2>
-      <div class="mt-8 grid md:grid-cols-3 gap-6">
+      <div class="mt-8 grid lg:grid-cols-2 gap-6 items-stretch">
         <div class="rounded-2xl p-6 bg-white/5 ring-1 ring-white/10">
-          <h3 class="font-semibold">Terminy</h3>
-          <p class="mt-2 text-slate-300/90">Piątek–niedziela, <strong>24–26 października</strong>. Dokładne godziny dojazdu/wyjazdu potwierdzimy bliżej terminu.</p>
-        </div>
-        <div class="rounded-2xl p-6 bg-white/5 ring-1 ring-white/10">
-          <h3 class="font-semibold">Transport</h3>
-          <p class="mt-2 text-slate-300/90">Pociąg / auta – zbieramy chętnych do wspólnych przejazdów. Daj znać, skąd jedziesz i czy masz wolne miejsca.</p>
-        </div>
-        <div class="rounded-2xl p-6 bg-white/5 ring-1 ring-white/10">
-          <h3 class="font-semibold">Nocleg</h3>
-          <p class="mt-2 text-slate-300/90">Opcje w centrum lub blisko plaży. Po potwierdzeniach zarezerwujemy najlepszy wariant dla grupy.</p>
-        </div>
-      </div>
-
-      <div class="mt-10 grid lg:grid-cols-2 gap-6 items-stretch">
-        <div class="rounded-2xl overflow-hidden ring-1 ring-white/10">
-          <iframe title="Mapa Gdańska" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9382.756248308845!2d18.6466389!3d54.3482465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46fd734b8fae0cd9%3A0x73631ef1a1c8861!2zR2RhxYJzaw!5e0!3m2!1spl!2spl!4v1695300000000!5m2!1spl!2spl" width="100%" height="360" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <h3 class="font-semibold">Mapa – 5 punktów programu</h3>
+          <div id="map" class="mt-4"></div>
+          <ul class="mt-4 text-sm text-slate-300/90 space-y-1 list-decimal list-inside">
+            <li><strong>Bazylika Mariacka</strong> – ul. Podkramarska 5</li>
+            <li><strong>Muzeum II Wojny Światowej</strong> – pl. Władysława Bartoszewskiego 1</li>
+            <li><strong>Europejskie Centrum Solidarności</strong> – pl. Solidarności 1</li>
+            <li><strong>Długi Targ / Fontanna Neptuna</strong> – Długi Targ</li>
+            <li><strong>Katedra Oliwska</strong> – ul. Biskupa Edmunda Nowickiego 5</li>
+          </ul>
         </div>
         <div class="rounded-2xl p-6 bg-white/5 ring-1 ring-white/10 flex flex-col justify-between">
           <div>
-            <h3 class="font-semibold">Co zabrać?</h3>
-            <ul class="mt-3 space-y-2 text-slate-300/90 list-disc list-inside">
+            <h3 class="font-semibold">Terminy i wskazówki</h3>
+            <p class="mt-2 text-slate-300/90">Piątek–niedziela, <strong>24–26 października</strong>. Pociąg / auta – zbieramy chętnych do wspólnych przejazdów. Daj znać, skąd jedziesz i czy masz wolne miejsca.</p>
+            <h4 class="mt-4 font-semibold">Co zabrać?</h4>
+            <ul class="mt-2 space-y-2 text-slate-300/90 list-disc list-inside">
               <li>wygodne buty i cienką kurtkę przeciwdeszczową,</li>
               <li>strój na plażę + ręcznik,</li>
               <li>dobry humor i chęć na wspólne spacery 😊</li>
@@ -211,39 +200,6 @@
         <p class="text-xs text-slate-400">Kliknięcie przycisku otworzy przygotowaną wiadomość w domyślnym kliencie poczty, którą wystarczy wysłać.</p>
       </form>
 
-      <script>
-        const form = document.getElementById('rsvpForm');
-        const mailtoLink = document.getElementById('mailtoLink');
-        const TO = 'organizer@example.com'; // ← PODMIEŃ na swój adres e‑mail
-
-        function enc(s){ return encodeURIComponent(s).replace(/%20/g,'+'); }
-
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const name = document.getElementById('name').value.trim();
-          const email = document.getElementById('email').value.trim();
-          const from = document.getElementById('from').value.trim();
-          const seats = document.getElementById('seats').value.trim();
-          const notes = document.getElementById('notes').value.trim();
-
-          const subject = `Potwierdzenie udziału – Weekend w Gdańsku (24–26.10) – ${name}`;
-          const lines = [
-            `Imię i nazwisko: ${name}`,
-            `E‑mail: ${email}`,
-            `Skąd jadę: ${from || '—'}`,
-            `Wolne miejsca w aucie: ${seats || '0'}`,
-            `Uwagi / propozycje: ${notes || '—'}`
-          ];
-          const body = lines.join('\n');
-          const href = `mailto:${TO}?subject=${enc(subject)}&body=${enc(body)}`;
-
-          window.location.href = href;
-          mailtoLink.href = href;
-          mailtoLink.classList.remove('hidden');
-          mailtoLink.focus();
-        });
-      </script>
-
       <div class="mt-10 text-sm text-slate-400">
         Masz pytania? Napisz: <a class="underline underline-offset-4 hover:text-white" href="mailto:organizer@example.com">organizer@example.com</a>
       </div>
@@ -255,50 +211,44 @@
     <p>© 2025 • Weekend w Gdańsku • Do zobaczenia nad Motławą!</p>
   </footer>
 
-  <!-- Countdown script -->
+  <!-- Skrypty -->
   <script>
-    (function(){
-      // Docelowa data i godzina startu wyjazdu (czas lokalny przeglądarki)
-      const target = new Date('2025-10-24T18:00:00');
-      const d = document;
-      const daysEl = d.getElementById('cd-days');
-      const hoursEl = d.getElementById('cd-hours');
-      const minsEl = d.getElementById('cd-mins');
-      const secsEl = d.getElementById('cd-secs');
+    // Countdown (24.10 godz. 12:00 lokalnie)
+    const countdownEl = document.getElementById('countdown');
+    const eventDate = new Date('2025-10-24T12:00:00');
+    function updateCountdown(){
+      const now = new Date();
+      const diff = eventDate - now;
+      if(diff <= 0){ countdownEl.textContent = "Już czas! Do zobaczenia w Gdańsku!"; return; }
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff / (1000*60*60)) % 24);
+      const minutes = Math.floor((diff / (1000*60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      countdownEl.textContent = `Pozostało ${days} dni, ${hours} h, ${minutes} min, ${seconds} s`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
-      function pad(n){ return String(n).padStart(2,'0'); }
+    // Mapa Leaflet – punkty programu
+    const map = L.map('map').setView([54.3520, 18.6466], 12); // centrum Gdańska
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
 
-      function tick(){
-        const now = new Date();
-        let diff = target - now;
-        if (diff <= 0){
-          daysEl.textContent = '0';
-          hoursEl.textContent = '00';
-          minsEl.textContent = '00';
-          secsEl.textContent = '00';
-          const c = d.getElementById('countdown');
-          if (c && !d.getElementById('countdown-note')){ c.insertAdjacentHTML('afterend', '<p id="countdown-note" class="mt-3 text-sm text-emerald-300">To już dziś – do zobaczenia! 🎉</p>'); }
-          clearInterval(timer);
-          return;
-        }
-        const days = Math.floor(diff / (1000*60*60*24));
-        diff -= days * (1000*60*60*24);
-        const hours = Math.floor(diff / (1000*60*60));
-        diff -= hours * (1000*60*60);
-        const mins = Math.floor(diff / (1000*60));
-        diff -= mins * (1000*60);
-        const secs = Math.floor(diff / 1000);
+    const points = [
+      { name: 'Bazylika Mariacka', coords: [54.3499, 18.6536], desc: 'Wejście na wieżę = świetny widok.' },
+      { name: 'Muzeum II Wojny Światowej', coords: [54.3579, 18.6560], desc: 'Mocna, nowoczesna ekspozycja.' },
+      { name: 'Europejskie Centrum Solidarności', coords: [54.3606, 18.6496], desc: 'Historia Solidarności i lat 80.' },
+      { name: 'Długi Targ / Fontanna Neptuna', coords: [54.3489, 18.6539], desc: 'Serce starego miasta.' },
+      { name: 'Katedra Oliwska', coords: [54.4091, 18.5672], desc: 'Słynne organy, obok Park Oliwski.' }
+    ];
 
-        daysEl.textContent = days;
-        hoursEl.textContent = pad(hours);
-        minsEl.textContent = pad(mins);
-        secsEl.textContent = pad(secs);
-      }
+    const markers = points.map((p, i) => {
+      return L.marker(p.coords).addTo(map).bindPopup(`<strong>${i+1}. ${p.name}</strong><br>${p.desc}`);
+    });
 
-      const timer = setInterval(tick, 1000);
-      tick();
-    })();
+    const group = L.featureGroup(markers);
+    map.fitBounds(group.getBounds().pad(0.15));
   </script>
 </body>
 </html>
-
